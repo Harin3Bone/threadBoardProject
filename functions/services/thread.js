@@ -62,7 +62,16 @@ function addOnceThread(req, res) {
     }
 }
 
+//? Update Once thread
+function updateOnceThread(req,res){
+    let userId = req.body.create_by;
+    let threadId = req.body.id;    
+
+    return res.send(threadId + "||" + userId);
+}
+
 //! Export
 module.exports = {
-    addOnceThread
+    addOnceThread,
+    updateOnceThread
 }

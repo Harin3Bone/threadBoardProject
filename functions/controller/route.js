@@ -16,5 +16,8 @@ router.get("/user",users.getOnceUser);
 //# Add once thread
 router.post("/thread",threads.addOnceThread);
 
+//# Update once thread
+router.put("/thread/update",threads.updateOnceThread);
+
 //! Export
 module.exports = router;
