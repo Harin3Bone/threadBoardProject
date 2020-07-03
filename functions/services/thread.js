@@ -62,7 +62,92 @@ function addOnceThread(req, res) {
     }
 }
 
+// //? Update Once thread
+function updateOnceThread(req, res) {
+    //~ Input Data
+    let userId = req.body.create_by;
+    let threadId = req.body.id;
+
+    //~ Edit Data
+    let threadTitle = req.body.title;
+    let threadContent = req.body.content;
+
+    //# Generate DateTime
+    let dateGenerate = new Date(Date.now());
+    let threadDate = dateGenerate.toLocaleDateString();
+    let threadTime = dateGenerate.toLocaleTimeString();
+    let threadEdit = threadDate + "?" + threadTime;
+
+    //~ Function Using
+    checkThreadCreator();
+    editThreadData();
+
+    //# Get Thread Data
+    function getThreadData() {
+        let threadSnapshot = db.collection('Threads').doc(threadId).get();
+
+        if(threadSnapshot!=null || threadSnapshot != undefined){
+            return threadSnapshot;
+        }
+        else{
+            //! Error Thread not Found
+            return res.status(404).json({
+                status: 404,
+                data: "Error, Thread not found"
+            }); 
+        }                
+    }
+
+    //# Check thread creator
+    async function checkThreadCreator() {
+        let threadData = await getThreadData();
+
+        if (threadData.data().create_by !== userId) {
+            return res.status(404).json({
+                status: 404,
+                data: "Error, You do not have permission to edit this thread"
+            });
+        }
+    }
+
+    //# Edit thread Data
+    function editThreadData() {
+        let threadRef = db.collection("Threads").doc(threadId);
+        let threadOnce = threadRef
+            .get()
+            .then(doc => {
+                if (!doc.exists) {
+                    //! Thread not found -> Error
+                    return res.status(404).json({
+                        status: 404,
+                        data: "Error, Thread not found"
+                    });
+                } else {
+                    //* Update Thread Data
+                    let threadSet = threadRef.update({                        
+                        title: threadTitle,
+                        content: threadContent,
+                        edit_at: threadEdit
+                    });
+
+                    //* Update Successful
+                    return res.status(201).json({
+                        status: 201,
+                        data: "Thread has been update successful"
+                    });
+                }
+            })
+            .catch(err => {
+                return res.status(404).json({
+                    status: 404,
+                    data: "Error, some input was missing"
+                });
+            });
+    }
+}
+
 //! Export
 module.exports = {
-    addOnceThread
+    addOnceThread,
+    updateOnceThread
 }
