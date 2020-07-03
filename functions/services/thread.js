@@ -62,12 +62,26 @@ function addOnceThread(req, res) {
     }
 }
 
-//? Update Once thread
+// //? Update Once thread
 function updateOnceThread(req,res){
+    //~ Input Data
     let userId = req.body.create_by;
     let threadId = req.body.id;    
 
-    return res.send(threadId + "||" + userId);
+    //~ Function Using
+    checkThreadCreator();
+
+    //# Get Thread Data
+    function getThreadData(){        
+        let threadSnapshot = db.collection('Threads').doc(threadId).get();        
+        return threadSnapshot;
+    }
+    
+    //# Check thread creator
+    async function checkThreadCreator(){
+        let threadData = await getThreadData();
+        return res.send(threadData.data());
+    }
 }
 
 //! Export
