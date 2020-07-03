@@ -101,21 +101,72 @@ function addOnceUser(req, res) {
 }
 
 //? Get Once User
-function getOnceUser(req, res) {
+async function getOnceUser(req, res) {
     //~ Input data
-    let userName = req.body.username;    
+    let userName = req.body.username;
     let userPassword = req.body.password;
 
     //~ Function Using
-    loginProcess(userName,userPassword);
+    findUsername()
 
-    //* Success
-    function loginProcess(username,password){
-        return res.status(200)
-                .json({
-                    username:a,
-                    password:b
+
+    //# Find username
+    async function getUserId() {
+        var usernameAllData = []
+
+        var usernameSnapshot = db.collection('Users').get()
+        for (const userDoc of (await usernameSnapshot).docs) {
+            usernameAllData.push(userDoc.data().id)
+        }
+        return usernameAllData
+    }
+
+    async function findUsername() {
+        let thisUsername;
+        let userSnapshot = await getUserId();
+        for (var index = 0; index < userSnapshot.length; index++) {
+            //~ Get username from userId
+            thisUsername = feature.getUsernameFromId(userSnapshot[index])
+
+            //* Check username if Found -> Get password from db
+            if (userName === thisUsername) {
+                loginProcess(userSnapshot[index]);
+                break;
+            } else {
+                //! User not Found -> Error
+                return res.status(404).json({
+                    status: 404,
+                    data: "Error, Account not found"
                 })
+            }
+        }
+    }
+
+    //* Begin Login Process
+    function loginProcess(userId) {
+        let userRef = db.collection('Users').doc(userId);
+        let getOnce = userRef.get()
+            .then(doc => {
+                if (!doc.exists) {
+                    //! Account not Found -> Error
+                    return res.status(404).json({
+                        status: 404,
+                        data: "Error, Your password or username is incorrect"
+                    })
+                } else {
+                    //~ User Found : Check password                       
+                    if (userPassword === doc.data().password) {
+                        //* Login Complete
+                        return res.send(doc.data());
+                    } 
+                }
+            })
+            .catch(error => {
+                return res.status(404).json({
+                    status: 404,
+                    data: "Error," + error
+                })
+            });
     }
 }
 

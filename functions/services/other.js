@@ -10,8 +10,16 @@ function validatePassword(password){
     return passwordValidator.test(password);
 }
 
+//? Get username from userId
+function getUsernameFromId(userId){
+    var findUsername = userId.indexOf("|");
+    var getUsername = userId.substring(findUsername+1);
+    return getUsername;
+}
+
 //! Export
 module.exports = {
     validateEmail,
-    validatePassword
+    validatePassword,
+    getUsernameFromId
 }
