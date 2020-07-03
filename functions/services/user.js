@@ -91,11 +91,8 @@ function addOnceUser(req, res) {
         //* Add User Success -> Registration Complete
         return res.status(201)
             .json({
-                id: userId,
-                name: userName,
-                password: userPassword,
-                email: userEmail,
-                data: "Registration Successful"
+                status: 201,
+                data: "User Registration Successful"
             });
     }
 }
@@ -157,8 +154,12 @@ async function getOnceUser(req, res) {
                     //~ User Found : Check password                       
                     if (userPassword === doc.data().password) {
                         //* Login Complete
-                        return res.send(doc.data());
-                    } 
+                        return res.status(200)
+                            .json({
+                                status: 200,
+                                data: "Login Successful"
+                            });
+                    }
                 }
             })
             .catch(error => {
