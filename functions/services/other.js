@@ -1,3 +1,4 @@
+//# USER
 //? Email Checker -> Must have @ and .com
 function validateEmail(email){
     var emailValidator = /\S+@\S+\.\S+/;
@@ -16,6 +17,8 @@ function getUsernameFromId(userId){
     var getUsername = userId.substring(findUsername+1);
     return getUsername;
 }
+
+//# THREAD
 
 //! Export
 module.exports = {
