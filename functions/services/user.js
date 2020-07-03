@@ -97,11 +97,18 @@ function addOnceUser(req, res) {
     }
 }
 
-//? Get Once User
+//? User Login
 async function getOnceUser(req, res) {
     //~ Input data
     let userName = req.body.username;
     let userPassword = req.body.password;
+    
+    //# Generate DateTime
+    let dateGenerate = new Date(Date.now());
+    let userDate = dateGenerate.toLocaleDateString();
+    let userTime = dateGenerate.toLocaleTimeString();
+    let userLastLogin = userDate + "?" + userTime;
+
 
     //~ Function Using
     findUsername()
@@ -153,7 +160,12 @@ async function getOnceUser(req, res) {
                 } else {
                     //~ User Found : Check password                       
                     if (userPassword === doc.data().password) {
-                        //* Login Complete
+                        //# Update Login Date                        
+                        let loginSet = userRef.update({                        
+                            last_login_at:userLastLogin
+                        });
+                                                
+                        //* Login Complete                        
                         return res.status(200)
                             .json({
                                 status: 200,
@@ -170,6 +182,8 @@ async function getOnceUser(req, res) {
             });
     }
 }
+
+
 
 //! Export 
 module.exports = {
