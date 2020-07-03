@@ -22,7 +22,6 @@ function addOnceUser(req, res) {
     emailValidate();
     passwordValidate();
     usernameValidate();
-    addUser();
 
     //# Check Email -> Must have @ and .com
     function emailValidate() {
@@ -71,13 +70,24 @@ function addOnceUser(req, res) {
                     status: 404,
                     data: "Error, This username already existed"
                 })
-            } else {
-                continue;
             }
         }
+
+        //* Add User after validate username , password , email success
+        addUser();
     }
 
-    function addUser() {
+    async function addUser() {
+        let userRef = db.collection('Users').doc(userId);
+
+        //* Add User to Cloud Firestore
+        let setUser = userRef.set({
+            id: userId,
+            name: userName,
+            password: userPassword,
+            email: userEmail
+        });
+
         //* Add User Success -> Registration Complete
         return res.status(201)
             .json({
@@ -87,8 +97,6 @@ function addOnceUser(req, res) {
                 email: userEmail
             });
     }
-
-
 }
 
 //! Export 
