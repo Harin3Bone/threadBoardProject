@@ -41,7 +41,34 @@ function addOnceUser(req, res) {
                 data: "Error, Password not in format"
             });
     }
-    
+
+    // //# Check Username -> Must not same as another account
+    getUser();
+
+    async function getUsernameSnapshot() {
+        var usernameAllData = []
+        var usernameSnapshot = db.collection('Users').get()
+        for (const userDoc of (await usernameSnapshot).docs) {
+            usernameAllData.push(userDoc.data().username)
+        }
+        return usernameAllData
+    }
+
+    async function getUser() {
+        let userSnapshot = await getUsernameSnapshot();
+        for (var index = 0; index < userSnapshot.length; index++) {
+            //! Found Same username
+            if (userName === userSnapshot[index]) {
+                return res.status(404).json({
+                    status: 404,
+                    data: "Error, This username already existed"
+                })
+            } else {
+                continue;
+            }
+        }
+    }
+
     //* Add User Success -> Registration Complete
     return res.status(201)
         .json({
