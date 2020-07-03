@@ -94,7 +94,8 @@ function addOnceUser(req, res) {
                 id: userId,
                 name: userName,
                 password: userPassword,
-                email: userEmail
+                email: userEmail,
+                data: "Registration Successful"
             });
     }
 }
