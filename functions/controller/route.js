@@ -8,5 +8,8 @@ const users = require("../services/user");
 //# Add once user
 router.post("/user",users.addOnceUser);
 
+//? User Login
+router.get("/user",users.getOnceUser);
+
 //! Export
 module.exports = router;
