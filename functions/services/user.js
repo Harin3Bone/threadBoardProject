@@ -12,39 +12,47 @@ const feature = require('./other');
 //~ Function Declaration
 //? Add once user
 function addOnceUser(req, res) {
-    //# Input data
+    //~ Input data
     let userName = req.body.username;
     let userId = uuid() + "|" + userName;
     let userPassword = req.body.password;
     let userEmail = req.body.email;
 
+    //~ Function Using
+    emailValidate();
+    passwordValidate();
+    usernameValidate();
+    addUser();
+
     //# Check Email -> Must have @ and .com
-    let emailChk = feature.validateEmail(userEmail);
+    function emailValidate() {
+        let emailChk = feature.validateEmail(userEmail);
 
-    //! If is not Email -> Error
-    if (!emailChk) {
-        return res.status(404)
-            .json({
-                status: 404,
-                data: "Error, Invalid email address"
-            });
+        //! If is not Email -> Error
+        if (!emailChk) {
+            return res.status(404)
+                .json({
+                    status: 404,
+                    data: "Error, Invalid email address"
+                });
+        }
     }
 
-    //# Check Password -> At least 1 Uppercase , 1 Lowercase , 1 Number And length in range 10-20 character only
-    let passwordChk = feature.validatePassword(userPassword);
+    function passwordValidate() {
+        //# Check Password -> At least 1 Uppercase , 1 Lowercase , 1 Number And length in range 10-20 character only
+        let passwordChk = feature.validatePassword(userPassword);
 
-    //! If Password in not in format
-    if (!passwordChk) {
-        return res.status(404)
-            .json({
-                status: 404,
-                data: "Error, Password not in format"
-            });
+        //! If Password in not in format
+        if (!passwordChk) {
+            return res.status(404)
+                .json({
+                    status: 404,
+                    data: "Error, Password not in format"
+                });
+        }
     }
 
-    // //# Check Username -> Must not same as another account
-    getUser();
-
+    //# Check Username -> Must not same as another account
     async function getUsernameSnapshot() {
         var usernameAllData = []
         var usernameSnapshot = db.collection('Users').get()
@@ -54,7 +62,7 @@ function addOnceUser(req, res) {
         return usernameAllData
     }
 
-    async function getUser() {
+    async function usernameValidate() {
         let userSnapshot = await getUsernameSnapshot();
         for (var index = 0; index < userSnapshot.length; index++) {
             //! Found Same username
@@ -69,14 +77,18 @@ function addOnceUser(req, res) {
         }
     }
 
-    //* Add User Success -> Registration Complete
-    return res.status(201)
-        .json({
-            id: userId,
-            name: userName,
-            password: userPassword,
-            email: userEmail
-        });
+    function addUser() {
+        //* Add User Success -> Registration Complete
+        return res.status(201)
+            .json({
+                id: userId,
+                name: userName,
+                password: userPassword,
+                email: userEmail
+            });
+    }
+
+
 }
 
 //! Export 
