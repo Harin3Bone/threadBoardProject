@@ -29,6 +29,18 @@ function addOnceUser(req, res) {
                 data: "Error, Invalid email address"
             });
     }
+
+    //# Check Password -> At least 1 Uppercase , 1 Lowercase , 1 Number And length in range 10-20 character only
+    let passwordChk = feature.validatePassword(userPassword);
+
+    //! If Password in not in format
+    if (!passwordChk) {
+        return res.status(404)
+            .json({
+                status: 404,
+                data: "Error, Password not in format"
+            });
+    }
     
     //* Add User Success -> Registration Complete
     return res.status(201)
