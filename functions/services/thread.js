@@ -24,8 +24,36 @@ function addOnceThread(req, res) {
     let threadTime = dateGenerate.toLocaleTimeString();
     let threadCreate = threadDate + "?" + threadTime;
 
-    //~ Using Function
-    addThreadData();
+    //~ Using Function        
+    checkUserId();
+
+    //# Check UserId is exist ?
+    async function getUsernameSnapshot() {
+        var userIdData = []
+        var userIdSnapshot = db.collection('Users').get()
+        for (const userDoc of (await userIdSnapshot).docs) {
+            userIdData.push(userDoc.data().id)
+        }
+        return userIdData
+    }
+
+    async function checkUserId() {
+        let userSnapshot = await getUsernameSnapshot();
+        for (var index = 0; index < userSnapshot.length; index++) {
+            //! Not Found UserId
+            if (userId !== userSnapshot[index]) {
+                return res.status(404).json({
+                    status: 404,
+                    data: "Error, Account not found"
+                })
+            }
+            else{
+                //* Add Thread after found userId is truly have
+                addThreadData();
+                break;
+            }
+        }                
+    }
 
     //* Success
     function addThreadData() {
