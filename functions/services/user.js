@@ -100,7 +100,27 @@ function addOnceUser(req, res) {
     }
 }
 
+//? Get Once User
+function getOnceUser(req, res) {
+    //~ Input data
+    let userName = req.body.username;    
+    let userPassword = req.body.password;
+
+    //~ Function Using
+    loginProcess(userName,userPassword);
+
+    //* Success
+    function loginProcess(username,password){
+        return res.status(200)
+                .json({
+                    username:a,
+                    password:b
+                })
+    }
+}
+
 //! Export 
 module.exports = {
-    addOnceUser
+    addOnceUser,
+    getOnceUser
 }
