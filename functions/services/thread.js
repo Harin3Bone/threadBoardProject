@@ -16,7 +16,7 @@ function addOnceThread(req, res) {
     let userId = req.body.id;
     let threadTitle = req.body.title;
     let threadContent = req.body.content;
-    let threadId = uuid() + "&" + threadTitle;
+    let threadId = uuid();
 
     //# Generate DateTime
     let dateGenerate = new Date(Date.now());
