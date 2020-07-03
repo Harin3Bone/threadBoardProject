@@ -5,18 +5,18 @@ const router = require("express").Router();
 const users = require("../services/user");
 const threads = require("../services/thread");
 
-//! API (User)
+//-- API (User)
 //# Add once user
 router.post("/user",users.addOnceUser);
 
-//* User Login
-router.get("/user",users.getOnceUser);
+//? User Login
+router.put("/user",users.getOnceUser);
 
-//? API (Thread)
+//-- API (Thread)
 //# Add once thread
 router.post("/thread",threads.addOnceThread);
 
-//# Update once thread
+//? Update once thread
 router.put("/thread/update",threads.updateOnceThread);
 
 //! Export
