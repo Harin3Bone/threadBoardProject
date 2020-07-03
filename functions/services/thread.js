@@ -22,21 +22,43 @@ function addOnceThread(req, res) {
     let dateGenerate = new Date(Date.now());
     let threadDate = dateGenerate.toLocaleDateString();
     let threadTime = dateGenerate.toLocaleTimeString();
-    let threadCreate = threadDate + "?" +threadTime;
+    let threadCreate = threadDate + "?" + threadTime;
 
     //~ Using Function
-    addThreadData();    
-    
+    addThreadData();
+
     //* Success
-    function addThreadData(){
-        res.status(200)
-        .json({
-            id: threadId,
-            title: threadTitle,
-            content: threadContent,
-            create_at: threadCreate,
-            by: userId
-        })
+    function addThreadData() {
+        let threadRef = db.collection("Threads").doc(threadId);
+        let threadOnce = threadRef
+            .get()
+            .then(doc => {
+                if (!doc.exists) {
+                    let threadSet = db.collection("Threads").doc(threadId);
+
+                    let threadSetData = threadSet.set({
+                        id: threadId,
+                        title: threadTitle,
+                        content: threadContent,
+                        create_at: threadCreate,
+                        create_by: userId
+                    });
+
+                    //* Create Thread Success
+                    return res.status(201).json({
+                        status: 201,
+                        data: "Thread create successful"
+                    });
+                } else {
+                    addOnceNews(req, res);
+                }
+            })
+            .catch(err => {
+                return res.status(404).json({
+                    status: 404,
+                    data: "Error, endpoint not found"
+                });
+            });
     }
 }
 
