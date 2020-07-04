@@ -121,29 +121,28 @@ async function userLogin(req, res) {
         var usernameSnapshot = db.collection('Users').get()
         for (const userDoc of (await usernameSnapshot).docs) {
             usernameAllData.push(userDoc.data().id)
-        }
+        }        
         return usernameAllData
     }
 
     async function findUsername() {
         let thisUsername;
         let userSnapshot = await getUserId();
-        for (var index = 0; index < userSnapshot.length; index++) {
+        for (var index = 0; index < userSnapshot.length; index++) {            
             //~ Get username from userId
-            thisUsername = feature.getUsernameFromId(userSnapshot[index])
-
+            thisUsername = feature.getUsernameFromId(userSnapshot[index])                                    
+            
             //* Check username if Found -> Get password from db
             if (userName === thisUsername) {
                 loginProcess(userSnapshot[index]);
                 break;
-            } else {
-                //! User not Found -> Error
-                return res.status(404).json({
-                    status: 404,
-                    data: "Error, Account not found"
-                })
             }
         }
+        
+        // return res.status(404).json({
+        //     status: 404,
+        //     data: "Error, Account not found"
+        // })
     }
 
     //* Begin Login Process
@@ -198,7 +197,7 @@ function getUserProfile(req, res) {
             .then(doc => {
                 if (doc.exists) {
                     //# Get Date Time
-                    if (typeof (doc.data().last_login_at) === String) {                        
+                    if (doc.data().last_login_at != undefined) {                        
                         let userLastLogin = feature.getDateTime(doc.data().last_login_at);
 
                         //* Restrict data viewing                                          
