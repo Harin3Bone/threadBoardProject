@@ -179,7 +179,14 @@ function getAllThread(req, res) {
     db.collection("Threads").get()
         .then((threadSnapshot) => {
             threadSnapshot.forEach((doc) => {
-                allThreadData.push(doc.data());
+                //# Get all should not able to see content (Just like Pantip,Medium)
+                let threadEachData = {
+                    id: doc.data().id,
+                    create_by: feature.getUsernameFromId(doc.data().create_by),
+                    title: doc.data().title
+                }
+
+                allThreadData.push(threadEachData);
             });
 
             //* Send all of thread
