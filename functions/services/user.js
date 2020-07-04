@@ -121,28 +121,36 @@ async function userLogin(req, res) {
         var usernameSnapshot = db.collection('Users').get()
         for (const userDoc of (await usernameSnapshot).docs) {
             usernameAllData.push(userDoc.data().id)
-        }        
+        }
         return usernameAllData
     }
 
     async function findUsername() {
         let thisUsername;
+        var loginStatus = false;
         let userSnapshot = await getUserId();
-        for (var index = 0; index < userSnapshot.length; index++) {            
+        for (var index = 0; index < userSnapshot.length; index++) {
             //~ Get username from userId
-            thisUsername = feature.getUsernameFromId(userSnapshot[index])                                    
-            
+            thisUsername = feature.getUsernameFromId(userSnapshot[index])
+
             //* Check username if Found -> Get password from db
             if (userName === thisUsername) {
+                loginStatus = true;
                 loginProcess(userSnapshot[index]);
                 break;
+            } else {
+                loginStatus = false;
             }
         }
-        
-        // return res.status(404).json({
-        //     status: 404,
-        //     data: "Error, Account not found"
-        // })
+
+        //! Account not Found -> Error
+        if (loginStatus === false) {
+            return res.status(404).json({
+                status: 404,
+                data: "Error, Account not found"
+            })
+        }
+
     }
 
     //* Begin Login Process
@@ -197,7 +205,7 @@ function getUserProfile(req, res) {
             .then(doc => {
                 if (doc.exists) {
                     //# Get Date Time
-                    if (doc.data().last_login_at != undefined) {                        
+                    if (doc.data().last_login_at != undefined) {
                         let userLastLogin = feature.getDateTime(doc.data().last_login_at);
 
                         //* Restrict data viewing                                          
