@@ -46,13 +46,12 @@ function addOnceThread(req, res) {
                     status: 404,
                     data: "Error, Account not found"
                 })
-            }
-            else{
+            } else {
                 //* Add Thread after found userId is truly have
                 addThreadData();
                 break;
             }
-        }                
+        }
     }
 
     //* Success
@@ -114,16 +113,15 @@ function updateOnceThread(req, res) {
     function getThreadData() {
         let threadSnapshot = db.collection('Threads').doc(threadId).get();
 
-        if(threadSnapshot!=null || threadSnapshot != undefined){
+        if (threadSnapshot != null || threadSnapshot != undefined) {
             return threadSnapshot;
-        }
-        else{
+        } else {
             //! Error Thread not Found
             return res.status(404).json({
                 status: 404,
                 data: "Error, Thread not found"
-            }); 
-        }                
+            });
+        }
     }
 
     //# Check thread creator
@@ -152,7 +150,7 @@ function updateOnceThread(req, res) {
                     });
                 } else {
                     //* Update Thread Data
-                    let threadSet = threadRef.update({                        
+                    let threadSet = threadRef.update({
                         title: threadTitle,
                         content: threadContent,
                         edit_at: threadEdit
@@ -174,8 +172,30 @@ function updateOnceThread(req, res) {
     }
 }
 
+//? Get All Thread
+function getAllThread(req, res) {
+    var allThreadData = [];
+
+    db.collection("Threads").get()
+        .then((threadSnapshot) => {
+            threadSnapshot.forEach((doc) => {
+                allThreadData.push(doc.data());
+            });
+
+            //* Send all of thread
+            return res.send(allThreadData);
+        })
+        .catch((error) => {
+            return res.status(404).json({
+                status: 404,
+                data: "Error, thread not found"
+            })
+        });
+}
+
 //! Export
 module.exports = {
     addOnceThread,
-    updateOnceThread
+    updateOnceThread,
+    getAllThread
 }
