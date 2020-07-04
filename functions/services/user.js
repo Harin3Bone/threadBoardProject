@@ -240,24 +240,81 @@ function getUserProfile(req, res) {
 }
 
 //? Edit user profile
-function updatePassword(req,res){
+function updatePassword(req, res) {
     //~ Input Data
     let userId = req.params.id;
-    let previousPassword = req.body.prePassword;    
+    let previousPassword = req.body.prePassword;
     let newPassword = req.body.newPassword;
     let reNewPassword = req.body.rePassword;
 
-    //~ Using Function
-    updateSuccess();
+    //* Update Password Process
+    let userRef = db.collection("Users").doc(userId);
+    let userOnce = userRef
+        .get()
+        .then(doc => {
+            if (!doc.exists) {
+                //! Account not found -> Error
+                return res.status(404).json({
+                    status: 404,
+                    data: "Error, Account not found"
+                });
+            } else {
+                //# Check previous password
+                checkPreviousPassword(doc.data().password);
 
-    //* Success
-    function updateSuccess(){
-        return res.status(201).json({
-            id:userId,
-            previous:previousPassword,            
-            after:newPassword,
-            re:reNewPassword
+                //# Check new password
+                checkRepeatPassword();
+
+                //# Check new password must not same previous password
+                checkCurrentNewPassword(previousPassword);
+                
+                //* Update password Data
+                let threadSet = userRef.update({
+                    password: newPassword
+                });
+
+                //* Update Successful
+                return res.status(201).json({
+                    status: 201,
+                    data: "Password has been update successfully"
+                });
+            }
         })
+        .catch(error => {
+            return res.status(404).json({
+                status: 404,
+                data: "Error, some input was missing"
+            });
+        });
+    
+    //# Check previous password -> for guarantee you're own account
+    function checkPreviousPassword(currentPassword){
+        if(currentPassword !== previousPassword){
+            return res.status(404).json({
+                status: 404,
+                data: "Error, your current password is incorrect."
+            });
+        }
+    }
+
+    //# Check new password & re new password -> for guarantee you're remember your password
+    function checkRepeatPassword(){
+        if(newPassword !== reNewPassword){
+            return res.status(404).json({
+                status: 404,
+                data: "Error, your new password are not same"
+            });
+        }
+    }
+
+    //# Check current password & new password
+    function checkCurrentNewPassword(currentPassword){
+        if(currentPassword === newPassword){
+            return res.status(404).json({
+                status: 404,
+                data: "Error, your new password is same as current password"
+            });
+        }
     }
 }
 
