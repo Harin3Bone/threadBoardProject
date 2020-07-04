@@ -25,5 +25,8 @@ router.post("/thread",threads.addOnceThread);
 //? Update once thread
 router.put("/thread/update",threads.updateOnceThread);
 
+//* Get all thread
+router.get("/thread",threads.getAllThread);
+
 //! Export
 module.exports = router;
