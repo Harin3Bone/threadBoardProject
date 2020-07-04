@@ -200,9 +200,46 @@ function getAllThread(req, res) {
         });
 }
 
+//? Get Once Thread
+function getOnceThread(req, res) {
+    //~ Input Data
+    let threadId = req.params.id;
+
+    //# Get thread data
+    let threadRef = db.collection("Threads").doc(threadId);
+    let threadOnce = threadRef.get()
+        .then(doc => {
+            if (doc.exists) {
+                //* Restrict data should view
+                let threadRestrict = {
+                    title: doc.data().title,
+                    content: doc.data().content,
+                    create_by: feature.getUsernameFromId(doc.data().create_by),
+                    create_date: feature.getOnlyDate(doc.data().create_at),
+                    create_time: feature.getOnlyTime(doc.data().create_at)
+                }
+
+                //* Get once thread success
+                return res.send(threadRestrict);
+            } else {
+                return res.status(404).json({
+                    status: 404,
+                    data: "Error, thread not found"
+                })
+            }
+        })
+        .catch((error) => {
+            return res.status(404).json({
+                status: 404,
+                data: "Error, thread not found" + error
+            })
+        });
+}
+
 //! Export
 module.exports = {
     addOnceThread,
     updateOnceThread,
-    getAllThread
+    getAllThread,
+    getOnceThread
 }
