@@ -89,7 +89,7 @@ function addOnceThread(req, res) {
     }
 }
 
-// //? Update Once thread
+//? Update Once thread
 function updateOnceThread(req, res) {
     //~ Input Data
     let userId = req.body.create_by;
@@ -210,17 +210,11 @@ function getOnceThread(req, res) {
     let threadOnce = threadRef.get()
         .then(doc => {
             if (doc.exists) {
-                //* Restrict data should view
-                let threadRestrict = {
-                    title: doc.data().title,
-                    content: doc.data().content,
-                    create_by: feature.getUsernameFromId(doc.data().create_by),
-                    create_date: feature.getOnlyDate(doc.data().create_at),
-                    create_time: feature.getOnlyTime(doc.data().create_at)
-                }
+                //! Check thread have edit or not ?
+                (doc.data().edit_at == undefined || doc.data().edit_at == null) ? restrictIfNoEdit(doc): restrictIfEdit(doc)
 
-                //* Get once thread success
-                return res.send(threadRestrict);
+                //! Or don't check and send all -> Front end choose by yourself what want todo
+                // return res.send(doc.data());
             } else {
                 return res.status(404).json({
                     status: 404,
@@ -234,6 +228,39 @@ function getOnceThread(req, res) {
                 data: "Error, thread not found" + error
             })
         });
+
+    //# Send Data Process -> If never edit
+    function restrictIfNoEdit(doc) {
+        //* Restrict data should view
+        let threadRestrict = {
+            title: doc.data().title,
+            content: doc.data().content,
+            create_by: feature.getUsernameFromId(doc.data().create_by),
+            create_date: feature.getOnlyDate(doc.data().create_at),
+            create_time: feature.getOnlyTime(doc.data().create_at)
+        }
+
+        //* Get once thread success
+        return res.send(threadRestrict);
+
+    }
+
+    //# Send Data Process -> Have once edit
+    function restrictIfEdit(doc) {
+        //* Restrict data should view
+        let threadRestrict = {
+            title: doc.data().title,
+            content: doc.data().content,
+            create_by: feature.getUsernameFromId(doc.data().create_by),
+            create_date: feature.getOnlyDate(doc.data().create_at),
+            create_time: feature.getOnlyTime(doc.data().create_at),
+            edit_date: feature.getOnlyDate(doc.data().edit_at),
+            edit_time: feature.getOnlyTime(doc.data().edit_at)
+        }
+
+        //* Get once thread success
+        return res.send(threadRestrict);
+    }
 }
 
 //! Export
