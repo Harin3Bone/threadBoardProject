@@ -16,10 +16,12 @@ function addOnceUser(req, res) {
     let userName = req.body.username;
     let userId = uuid() + "|" + userName;
     let userPassword = req.body.password;
+    let userRePassword = req.body.rePassword;
     let userEmail = req.body.email;
 
     //~ Function Using
     emailValidate();
+    passwordRepeat();
     passwordValidate();
     usernameValidate();
 
@@ -34,6 +36,17 @@ function addOnceUser(req, res) {
                     status: 404,
                     data: "Error, Invalid email address"
                 });
+        }
+    }
+
+    //# Password & Repeat password must same 
+    function passwordRepeat() {
+        //! Error -> for guarantee you're remember your password
+        if (userPassword !== userRePassword) {
+            return res.status(404).json({
+                status: 404,
+                data: "Error, your your password are not same"
+            });
         }
     }
 
@@ -62,6 +75,7 @@ function addOnceUser(req, res) {
     }
 
     async function usernameValidate() {
+        var usernameStatus = false;
         let userSnapshot = await getUsernameSnapshot();
         for (var index = 0; index < userSnapshot.length; index++) {
             //! Found Same username
@@ -71,10 +85,16 @@ function addOnceUser(req, res) {
                     data: "Error, This username already existed"
                 })
             }
+            else{
+                usernameStatus = true;
+                break;
+            }
         }
 
         //* Add User after validate username , password , email success
-        addUser();
+        if(usernameStatus === true){
+            addUser();
+        }
     }
 
     async function addUser() {
@@ -267,7 +287,7 @@ function updatePassword(req, res) {
 
                 //# Check new password must not same previous password
                 checkCurrentNewPassword(previousPassword);
-                
+
                 //#  Validate password format
                 passwordValidate()
 
@@ -289,11 +309,11 @@ function updatePassword(req, res) {
                 data: "Error, some input was missing"
             });
         });
-    
+
     //# Check previous password
-    function checkPreviousPassword(currentPassword){
+    function checkPreviousPassword(currentPassword) {
         //! Error -> for guarantee you're own account
-        if(currentPassword !== previousPassword){
+        if (currentPassword !== previousPassword) {
             return res.status(404).json({
                 status: 404,
                 data: "Error, your current password is incorrect."
@@ -302,9 +322,9 @@ function updatePassword(req, res) {
     }
 
     //# Check new password & re new password
-    function checkRepeatPassword(){
+    function checkRepeatPassword() {
         //! Error -> for guarantee you're remember your password
-        if(newPassword !== reNewPassword){
+        if (newPassword !== reNewPassword) {
             return res.status(404).json({
                 status: 404,
                 data: "Error, your new password are not same"
@@ -313,9 +333,9 @@ function updatePassword(req, res) {
     }
 
     //# Check current password & new password
-    function checkCurrentNewPassword(currentPassword){
+    function checkCurrentNewPassword(currentPassword) {
         //! Error -> for make sure you change password
-        if(currentPassword === newPassword){
+        if (currentPassword === newPassword) {
             return res.status(404).json({
                 status: 404,
                 data: "Error, your new password is same as current password"
