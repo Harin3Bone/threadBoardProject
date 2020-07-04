@@ -49,7 +49,8 @@ function getOnlyTime(dateTime) {
     return threadTime;
 }
 
-//# Encryption & Decryption
+//# Encryption & Decryption for Security
+//* Encryption
 function encrypt(text) {
     let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
     let encrypted = cipher.update(text);
@@ -60,6 +61,7 @@ function encrypt(text) {
     };
 }
 
+//* Decryption
 function decrypt(text) {
     let iv = Buffer.from(text.iv, 'hex');
     let encryptedText = Buffer.from(text.encryptedData, 'hex');

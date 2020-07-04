@@ -16,10 +16,12 @@ function addOnceUser(req, res) {
     let userName = req.body.username;
     let userId = uuid() + "|" + userName;
     let userPassword = req.body.password;
+    let userRePassword = req.body.rePassword;
     let userEmail = req.body.email;
 
     //~ Function Using
     emailValidate();
+    passwordRepeat();
     passwordValidate();
     usernameValidate();
 
@@ -37,6 +39,18 @@ function addOnceUser(req, res) {
         }
     }
 
+    //# Password & Repeat password must same 
+    function passwordRepeat(){
+        //! Error -> for guarantee you're remember your password
+        if(userPassword !== userRePassword){
+            return res.status(404).json({
+                status: 404,
+                data: "Error, your your password are not same"
+            });
+        }
+    }
+    
+    //# Password must in format
     function passwordValidate() {
         //# Check Password -> At least 1 Uppercase , 1 Lowercase , 1 Number And length in range 10-20 character only
         let passwordChk = feature.validatePassword(userPassword);
@@ -53,15 +67,16 @@ function addOnceUser(req, res) {
 
     //# Check Username -> Must not same as another account
     async function getUsernameSnapshot() {
-        var usernameAllData = []
-        var usernameSnapshot = db.collection('Users').get()
+        var usernameAllData = [];
+        var usernameSnapshot = db.collection('Users').get();
         for (const userDoc of (await usernameSnapshot).docs) {
-            usernameAllData.push(userDoc.data().username)
+            usernameAllData.push(userDoc.data().username);
         }
-        return usernameAllData
+        return usernameAllData;
     }
 
     async function usernameValidate() {
+        var usernameStatus = false;
         let userSnapshot = await getUsernameSnapshot();
         for (var index = 0; index < userSnapshot.length; index++) {
             //! Found Same username
@@ -71,20 +86,28 @@ function addOnceUser(req, res) {
                     data: "Error, This username already existed"
                 })
             }
+            else{
+                usernameStatus = true;
+                break;
+            }
         }
-
         //* Add User after validate username , password , email success
-        addUser();
+        if (usernameStatus === true){
+            addUser();
+        }
     }
 
     async function addUser() {
+        //# Encryption
+        let encryptPassword = await feature.encrypt(userPassword);
+        
         let userRef = db.collection('Users').doc(userId);
 
         //* Add User to Cloud Firestore
         let setUser = userRef.set({
             id: userId,
             username: userName,
-            password: userPassword,
+            password: encryptPassword,
             email: userEmail
         });
 
