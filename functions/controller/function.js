@@ -29,11 +29,26 @@ function getDateTime(dateTime) {
 }
 
 //# THREAD
+function getOnlyDate(dateTime) {
+    let threadIndex = dateTime.indexOf("?");
+    let threadDate = dateTime.substring(0, threadIndex);
+
+    return threadDate;
+}
+
+function getOnlyTime(dateTime) {
+    let threadIndex = dateTime.indexOf("?");
+    let threadTime = dateTime.substring(threadIndex + 1);
+
+    return threadTime;
+}
 
 //! Export
 module.exports = {
     validateEmail,
     validatePassword,
     getUsernameFromId,
-    getDateTime
+    getDateTime,
+    getOnlyDate,
+    getOnlyTime
 }

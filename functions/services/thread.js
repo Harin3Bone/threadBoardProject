@@ -210,9 +210,18 @@ function getOnceThread(req, res) {
     let threadOnce = threadRef.get()
         .then(doc => {
             if (doc.exists) {
-                return res.send(doc.data());
-            }
-            else{
+                //* Restrict data should view
+                let threadRestrict = {
+                    title: doc.data().title,
+                    content: doc.data().content,
+                    create_by: feature.getUsernameFromId(doc.data().create_by),
+                    create_date: feature.getOnlyDate(doc.data().create_at),
+                    create_time: feature.getOnlyTime(doc.data().create_at)
+                }
+
+                //* Get once thread success
+                return res.send(threadRestrict);
+            } else {
                 return res.status(404).json({
                     status: 404,
                     data: "Error, thread not found"
@@ -221,10 +230,10 @@ function getOnceThread(req, res) {
         })
         .catch((error) => {
             return res.status(404).json({
-                status:404,
-                data:"Error, thread not found"
+                status: 404,
+                data: "Error, thread not found" + error
             })
-        });    
+        });
 }
 
 //! Export
