@@ -83,7 +83,7 @@ function addOnceUser(req, res) {
         //* Add User to Cloud Firestore
         let setUser = userRef.set({
             id: userId,
-            name: userName,
+            username: userName,
             password: userPassword,
             email: userEmail
         });
@@ -98,11 +98,11 @@ function addOnceUser(req, res) {
 }
 
 //? User Login
-async function getOnceUser(req, res) {
+async function userLogin(req, res) {
     //~ Input data
     let userName = req.body.username;
     let userPassword = req.body.password;
-    
+
     //# Generate DateTime
     let dateGenerate = new Date(Date.now());
     let userDate = dateGenerate.toLocaleDateString();
@@ -161,14 +161,15 @@ async function getOnceUser(req, res) {
                     //~ User Found : Check password                       
                     if (userPassword === doc.data().password) {
                         //# Update Login Date                        
-                        let loginSet = userRef.update({                        
-                            last_login_at:userLastLogin
+                        let loginSet = userRef.update({
+                            last_login_at: userLastLogin
                         });
-                                                
+
                         //* Login Complete                        
                         return res.status(200)
                             .json({
                                 status: 200,
+                                id: doc.data().id,
                                 data: "Login Successful"
                             });
                     }
@@ -183,10 +184,57 @@ async function getOnceUser(req, res) {
     }
 }
 
+function getUserProfile(req, res) {
+    //~ Input Data
+    let userId = req.params.id;
 
+    //~ Using Function
+    getProfile();
+
+    //# Get Profile Data Process
+    function getProfile() {
+        let userRef = db.collection("Users").doc(userId);
+        let userOnce = userRef.get()
+            .then(doc => {
+                if (doc.exists) {
+                    //# Get Date Time
+                    if (typeof (doc.data().last_login_at) === String) {                        
+                        let userLastLogin = feature.getDateTime(doc.data().last_login_at);
+
+                        //* Restrict data viewing                                          
+                        return res.status(200).json({
+                            status: 200,
+                            username: doc.data().username,
+                            password: doc.data().password,
+                            email: doc.data().email,
+                            loginDate: userLastLogin[0],
+                            loginTime: userLastLogin[1]
+                        })
+                    } else {
+                        //! For this section it hard to conflict -> After login will get userId & last_login_at
+                        //* Not Found last_login_at
+                        return res.status(200).json({
+                            status: 200,
+                            username: doc.data().username,
+                            password: doc.data().password,
+                            email: doc.data().email
+                        })
+                    }
+
+
+                } else {
+                    return res.status(404).json({
+                        status: 404,
+                        data: "Error, Account not found"
+                    })
+                }
+            })
+    }
+}
 
 //! Export 
 module.exports = {
     addOnceUser,
-    getOnceUser
+    userLogin,
+    getUserProfile
 }

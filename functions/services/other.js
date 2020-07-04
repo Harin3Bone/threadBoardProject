@@ -1,4 +1,7 @@
 //# USER
+
+const { userLogin } = require("./user");
+
 //? Email Checker -> Must have @ and .com
 function validateEmail(email){
     var emailValidator = /\S+@\S+\.\S+/;
@@ -18,11 +21,22 @@ function getUsernameFromId(userId){
     return getUsername;
 }
 
+//? Get Date and Time
+function getDateTime(dateTime){
+    let userLoginIndex = dateTime.indexOf("?");
+    let userLoginDate = dateTime.substring(0,userLoginIndex);
+    let userLoginTime = dateTime.substring(userLoginIndex+1);
+    let userLastLogin = [userLoginDate,userLoginTime];    
+
+    return userLastLogin;
+}
+
 //# THREAD
 
 //! Export
 module.exports = {
     validateEmail,
     validatePassword,
-    getUsernameFromId
+    getUsernameFromId,
+    getDateTime
 }
