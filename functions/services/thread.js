@@ -200,9 +200,37 @@ function getAllThread(req, res) {
         });
 }
 
+//? Get Once Thread
+function getOnceThread(req, res) {
+    //~ Input Data
+    let threadId = req.params.id;
+
+    //# Get thread data
+    let threadRef = db.collection("Threads").doc(threadId);
+    let threadOnce = threadRef.get()
+        .then(doc => {
+            if (doc.exists) {
+                return res.send(doc.data());
+            }
+            else{
+                return res.status(404).json({
+                    status: 404,
+                    data: "Error, thread not found"
+                })
+            }
+        })
+        .catch((error) => {
+            return res.status(404).json({
+                status:404,
+                data:"Error, thread not found"
+            })
+        });    
+}
+
 //! Export
 module.exports = {
     addOnceThread,
     updateOnceThread,
-    getAllThread
+    getAllThread,
+    getOnceThread
 }
