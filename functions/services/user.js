@@ -268,6 +268,9 @@ function updatePassword(req, res) {
                 //# Check new password must not same previous password
                 checkCurrentNewPassword(previousPassword);
                 
+                //#  Validate password format
+                passwordValidate()
+
                 //* Update password Data
                 let threadSet = userRef.update({
                     password: newPassword
@@ -287,8 +290,9 @@ function updatePassword(req, res) {
             });
         });
     
-    //# Check previous password -> for guarantee you're own account
+    //# Check previous password
     function checkPreviousPassword(currentPassword){
+        //! Error -> for guarantee you're own account
         if(currentPassword !== previousPassword){
             return res.status(404).json({
                 status: 404,
@@ -297,8 +301,9 @@ function updatePassword(req, res) {
         }
     }
 
-    //# Check new password & re new password -> for guarantee you're remember your password
+    //# Check new password & re new password
     function checkRepeatPassword(){
+        //! Error -> for guarantee you're remember your password
         if(newPassword !== reNewPassword){
             return res.status(404).json({
                 status: 404,
@@ -309,11 +314,27 @@ function updatePassword(req, res) {
 
     //# Check current password & new password
     function checkCurrentNewPassword(currentPassword){
+        //! Error -> for make sure you change password
         if(currentPassword === newPassword){
             return res.status(404).json({
                 status: 404,
                 data: "Error, your new password is same as current password"
             });
+        }
+    }
+
+    //# Validate password format
+    function passwordValidate() {
+        //# Check Password -> At least 1 Uppercase , 1 Lowercase , 1 Number And length in range 10-20 character only
+        let passwordChk = feature.validatePassword(newPassword);
+
+        //! If Password in not in format
+        if (!passwordChk) {
+            return res.status(404)
+                .json({
+                    status: 404,
+                    data: "Error, Your new password is not in format"
+                });
         }
     }
 }
