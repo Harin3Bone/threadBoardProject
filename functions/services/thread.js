@@ -37,20 +37,25 @@ function addOnceThread(req, res) {
         return userIdData
     }
 
-    async function checkUserId() {
+    async function checkUserId() {      
+        let usernameStatus = false; 
         let userSnapshot = await getUsernameSnapshot();
-        for (var index = 0; index < userSnapshot.length; index++) {
+        for (var index = 0; index < userSnapshot.length; index++) {            
             //! Not Found UserId
-            if (userId !== userSnapshot[index]) {
-                return res.status(404).json({
-                    status: 404,
-                    data: "Error, Account not found"
-                })
+            if (userId !== userSnapshot[index]) {                
+                continue;
             } else {
                 //* Add Thread after found userId is truly have
+                usernameStatus = true;
                 addThreadData();
                 break;
             }
+        }
+        if (usernameStatus === false){
+            return res.status(404).json({
+                status: 404,
+                data: "Error, Account not found"
+            })
         }
     }
 

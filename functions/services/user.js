@@ -316,7 +316,7 @@ function updatePassword(req, res) {
         if (currentPassword !== previousPassword) {
             return res.status(404).json({
                 status: 404,
-                data: "Error, your current password is incorrect."
+                data: "Error, your current password is incorrect."                
             });
         }
     }
