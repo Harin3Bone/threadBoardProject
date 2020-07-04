@@ -1,9 +1,4 @@
 //# USER
-
-const {
-    userLogin
-} = require("./user");
-
 //? Email Checker -> Must have @ and .com
 function validateEmail(email) {
     var emailValidator = /\S+@\S+\.\S+/;
@@ -34,25 +29,6 @@ function getDateTime(dateTime) {
 }
 
 //# THREAD
-function testFunc() {
-    let newTxt;
-    var bfTxt = "D";
-    var arrayTest = ["a|A", "b|B", "c|C", "d|D", "e|E"];
-    for (var index = 0; index < arrayTest.length; index++) {
-        // console.log(arrayTest[index]);
-        newTxt = getUsernameFromId(arrayTest[index])
-        console.log(newTxt)
-        if (bfTxt === newTxt) {
-            console.log("Complete");
-            break;
-        } else {
-            console.log("Error");
-        }
-
-    }
-}
-
-// testFunc();
 
 //! Export
 module.exports = {

@@ -7,7 +7,7 @@ let db = admin.firestore();
 const uuid = require('uuid/v4');
 
 //~ Another Function
-const feature = require('./other');
+const feature = require('../controller/function');
 
 //~ Function Declaration
 //? Add once user
@@ -239,9 +239,110 @@ function getUserProfile(req, res) {
     }
 }
 
+//? Edit user profile
+function updatePassword(req, res) {
+    //~ Input Data
+    let userId = req.params.id;
+    let previousPassword = req.body.prePassword;
+    let newPassword = req.body.newPassword;
+    let reNewPassword = req.body.rePassword;
+
+    //* Update Password Process
+    let userRef = db.collection("Users").doc(userId);
+    let userOnce = userRef
+        .get()
+        .then(doc => {
+            if (!doc.exists) {
+                //! Account not found -> Error
+                return res.status(404).json({
+                    status: 404,
+                    data: "Error, Account not found"
+                });
+            } else {
+                //# Check previous password
+                checkPreviousPassword(doc.data().password);
+
+                //# Check new password
+                checkRepeatPassword();
+
+                //# Check new password must not same previous password
+                checkCurrentNewPassword(previousPassword);
+                
+                //#  Validate password format
+                passwordValidate()
+
+                //* Update password Data
+                let threadSet = userRef.update({
+                    password: newPassword
+                });
+
+                //* Update Successful
+                return res.status(201).json({
+                    status: 201,
+                    data: "Password has been update successfully"
+                });
+            }
+        })
+        .catch(error => {
+            return res.status(404).json({
+                status: 404,
+                data: "Error, some input was missing"
+            });
+        });
+    
+    //# Check previous password
+    function checkPreviousPassword(currentPassword){
+        //! Error -> for guarantee you're own account
+        if(currentPassword !== previousPassword){
+            return res.status(404).json({
+                status: 404,
+                data: "Error, your current password is incorrect."
+            });
+        }
+    }
+
+    //# Check new password & re new password
+    function checkRepeatPassword(){
+        //! Error -> for guarantee you're remember your password
+        if(newPassword !== reNewPassword){
+            return res.status(404).json({
+                status: 404,
+                data: "Error, your new password are not same"
+            });
+        }
+    }
+
+    //# Check current password & new password
+    function checkCurrentNewPassword(currentPassword){
+        //! Error -> for make sure you change password
+        if(currentPassword === newPassword){
+            return res.status(404).json({
+                status: 404,
+                data: "Error, your new password is same as current password"
+            });
+        }
+    }
+
+    //# Validate password format
+    function passwordValidate() {
+        //# Check Password -> At least 1 Uppercase , 1 Lowercase , 1 Number And length in range 10-20 character only
+        let passwordChk = feature.validatePassword(newPassword);
+
+        //! If Password in not in format
+        if (!passwordChk) {
+            return res.status(404)
+                .json({
+                    status: 404,
+                    data: "Error, Your new password is not in format"
+                });
+        }
+    }
+}
+
 //! Export 
 module.exports = {
     addOnceUser,
     userLogin,
-    getUserProfile
+    getUserProfile,
+    updatePassword
 }
