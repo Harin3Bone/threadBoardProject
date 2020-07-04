@@ -7,7 +7,7 @@ let db = admin.firestore();
 const uuid = require('uuid/v4');
 
 //~ Another Function
-const feature = require('./other');
+const feature = require('../controller/function');
 
 //~ Function Declaration
 //? Add once user
@@ -239,9 +239,32 @@ function getUserProfile(req, res) {
     }
 }
 
+//? Edit user profile
+function updatePassword(req,res){
+    //~ Input Data
+    let userId = req.params.id;
+    let previousPassword = req.body.prePassword;    
+    let newPassword = req.body.newPassword;
+    let reNewPassword = req.body.rePassword;
+
+    //~ Using Function
+    updateSuccess();
+
+    //* Success
+    function updateSuccess(){
+        return res.status(201).json({
+            id:userId,
+            previous:previousPassword,            
+            after:newPassword,
+            re:reNewPassword
+        })
+    }
+}
+
 //! Export 
 module.exports = {
     addOnceUser,
     userLogin,
-    getUserProfile
+    getUserProfile,
+    updatePassword
 }

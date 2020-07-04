@@ -7,7 +7,7 @@ let db = admin.firestore();
 const uuid = require('uuid/v4');
 
 //~ Another Function
-const feature = require('./other');
+const feature = require('../controller/function');
 
 //~ Function Declaration
 //? Add Once Thread

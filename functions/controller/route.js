@@ -13,7 +13,10 @@ router.post("/user",users.addOnceUser);
 router.put("/user",users.userLogin);
 
 //* User profile page
-router.get("/user/:id",users.getUserProfile)
+router.get("/user/:id",users.getUserProfile);
+
+//? Edit profile
+router.put("/user/:id/update",users.updatePassword);
 
 //-- API (Thread)
 //# Add once thread
