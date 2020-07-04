@@ -10,7 +10,10 @@ const threads = require("../services/thread");
 router.post("/user",users.addOnceUser);
 
 //? User Login
-router.put("/user",users.getOnceUser);
+router.put("/user",users.userLogin);
+
+//* User profile page
+router.get("/user/:id",users.getUserProfile)
 
 //-- API (Thread)
 //# Add once thread

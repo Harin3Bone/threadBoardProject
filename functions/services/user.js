@@ -98,7 +98,7 @@ function addOnceUser(req, res) {
 }
 
 //? User Login
-async function getOnceUser(req, res) {
+async function userLogin(req, res) {
     //~ Input data
     let userName = req.body.username;
     let userPassword = req.body.password;
@@ -169,6 +169,7 @@ async function getOnceUser(req, res) {
                         return res.status(200)
                             .json({
                                 status: 200,
+                                id: doc.data().id,
                                 data: "Login Successful"
                             });
                     }
@@ -183,10 +184,36 @@ async function getOnceUser(req, res) {
     }
 }
 
+function getUserProfile(req,res){
+    //~ Input Data
+    let userId = req.params.id;
 
+    //~ Using Function
+    getProfile();
+    
+    //# Get Profile Data Process
+    function getProfile(){
+        var userProfile = [];
+        let userRef = db.collection("Users").doc(userId);
+        let userOnce = userRef.get()
+            .then(doc => {
+                if(doc.exists){
+                    userProfile.push(doc.data());
+                    return res.send(userProfile);
+                }
+                else{
+                    return res.status(404).json({
+                        status: 404,
+                        data: "Error, Account not found"
+                    })
+                }
+            })
+    }
+}
 
 //! Export 
 module.exports = {
     addOnceUser,
-    getOnceUser
+    userLogin,
+    getUserProfile
 }
